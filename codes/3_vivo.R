@@ -263,7 +263,8 @@ all %>% as.data.frame() %>%
   filter (Formulation == "ER300") %>% summarise(q_ll = min(ratio), q_ul = max(ratio)) %>% 
   mutate(diff = q_ul - q_ll)  
 
-tiff("plots/fig6.tiff", res=600, compression = "lzw", height = 12, width = 15, units="in")
+#tiff("plots/fig6.tiff", res=600, compression = "lzw", height = 12, width = 15, units="in")
+pdf("plots/fig6.pdf", height = 12, width = 15)
 plot_grid(
   plot_grid(p6.1, p6.2, plot_grid(p6.3, p6.4, nrow=1), ncol = 3, labels = c('A'), label_size = 22),
   plot_grid(p6.5, p6.6, align = 'h', axis = 'b', rel_widths = c(3/5,2/5), labels = c('B', 'C'), label_size = 22),
@@ -386,7 +387,8 @@ dat.v <- df[c(1:subset.n),c(str_1.1:end_3.2)] %>% gather() %>%
   add_column(Formulation = rep(form, each = 14*subset.n))
 dat.v$Formulation <- factor(dat.v$Formulation, level = form)
 
-tiff("plots/fig7.tiff", res=600, compression = "lzw", height = 8, width = 14, units="in")
+#tiff("plots/fig7.tiff", res=600, compression = "lzw", height = 8, width = 14, units="in")
+pdf("plots/fig7.pdf", height = 8, width = 14)
 dat.v %>% ggplot(aes(Time, Conc)) +
   facet_wrap(~Formulation, dir="v", nrow=2)+
   scale_x_log10() +
@@ -760,7 +762,7 @@ dat_tab.1 %<>%
 dat_tab.1$level.pass <- factor(dat_tab.1$level.pass, level = rev(BE.lab))
 
 dat_tab.1
-# save(dat_tab.2, file = "outputs/dat_tab.1.rda")
+# save(dat_tab.1, file = "outputs/dat_tab.1.rda")
 # load(file = "outputs/dat_tab.1.rda")
 
 hdi <- d[,"Weibull_scale_IR(1)"] %>% hdi() 
@@ -989,7 +991,8 @@ p8.2 <- dat_tab.2 %>%
         axis.text = element_text(size = 10, colour = "black", face = "bold"),
         axis.title = element_text(size = 12, colour = "black", face = "bold"))
 
-tiff("plots/fig8.tiff", res=600, compression = "lzw", height = 9, width = 12, units="in")
+#tiff("plots/fig8.tiff", res=600, compression = "lzw", height = 9, width = 12, units="in")
+pdf("plots/fig8.pdf", height = 9, width = 12)
 plot_grid(p8.2, p8.1, nrow = 2, rel_heights = c(4/5, 1/5),  align = "v", axis = "l")
 dev.off()
 #ggsave("plots/fig8.jpeg", dpi = 300, height = 9, width = 12, units="in")
