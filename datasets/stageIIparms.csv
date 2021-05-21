@@ -1,0 +1,14 @@
+Parameter,Distribution,Mean,SD,Lower bound,Upper bound,Notes
+G\_Radius,Uniform,,,10,100,Vague prior
+Peff,Uniform,,,0.05,0.31,\cite{melillo2019variance}
+Fu\_plasma,Truncated Normal,0.16,0.032,0.064,0.256,20\% CV with truncation 3 SD
+Fu\_vitro\_liver,Truncated Normal,0.16,0.032,0.064,0.256,20\% CV with truncation 3 SD
+Kpuu\_liver,LogUniform,,,0.5,5,Vague prior
+Vmax\_met\_vitro\_liver,Truncated LogNormal,0.0001,2,0.00001,0.001,\cite{connarn2015metabolism}
+V\_central\_LKg,Truncated Normal,15,4.5,1.5,28.5,\cite{connarn2015metabolism}
+Kc2p,Truncated Normal,0.1,0.03,0.01,0.19,\cite{connarn2015metabolism}
+Kp2c,Truncated Normal,0.04,0.12,0.004,0.076,\cite{connarn2015metabolism}
+Weibull\_scale\_IR,Truncated Normal,0.17,0.034,0.068,0.272,Posterior of stage I
+Weibull\_scale\_SR,Truncated Normal,3,0.6,1.2,4.8,Posterior of stage I
+Weibull\_scale\_ER,Truncated Normal,3,0.6,1.2,4.8,Posterior of stage I
+Weibull\_slope\_ER,Truncated Normal,1.8,0.18,1.26,2.34,Posterior of stage I

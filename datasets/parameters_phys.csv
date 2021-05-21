@@ -1,0 +1,55 @@
+Parameter,Description,Default,Minimum,Maximum,Reference
+BDM,"Body mass, kg",,,,Observed
+sc\_F\_total,"Cardic output scaling coeficient, L$\cdot$kg$^{-0.75}$",15,10.5,19.5,\cite{perdaems2010pred}
+f\_Flow\_stom,"Fraction of cardiac output going to stomach, -",0.024,0.019,0.029,\cite{perdaems2010pred}
+f\_Flow\_duod,"Fraction of cardiac output going to duodenum, -",0.016,0.011,0.021,\cite{perdaems2010pred}
+f\_Flow\_jeju,"Fraction of cardiac output going to jejunum, -",0.056,0.051,0.061,\cite{perdaems2010pred}
+f\_Flow\_ileum,"Fraction of cardiac output going to ileum, -",0.033,0.028,0.038,\cite{perdaems2010pred}
+f\_Flow\_cecum,"Fraction of cardiac output going to cecum, -",0.006,0.001,0.011,\cite{perdaems2010pred}
+f\_Flow\_colon,"Fraction of cardiac output going to colon, -",0.038,0.033,0.043,\cite{perdaems2010pred}
+f\_Flow\_liver,"Fraction of cardiac output going to liver, -",0.25,0.2,0.3,\cite{perdaems2010pred}
+f\_BDM\_stom,"Body mass fraction of stomach, -",0.0021,0.0016,0.0026,\cite{perdaems2010pred}
+f\_BDM\_duod,"Body mass fraction of duodenum, -",0.0003,0.0001,0.0005,\cite{perdaems2010pred}
+f\_BDM\_jeju,"Body mass fraction of jejunum, -",0.0009,0.0004,0.0014,\cite{perdaems2010pred}
+f\_BDM\_ileum,"Body mass fraction of ileum, -",0.0006,0.0001,0.0011,\cite{perdaems2010pred}
+f\_BDM\_cecum,"Body mass fraction of cecum, -",0.0005,0.0001,0.0009,\cite{perdaems2010pred}
+f\_BDM\_colon,"Body mass fraction of colon, -",0.0048,0.0043,0.0053,\cite{perdaems2010pred}
+f\_BDM\_liver,"Body mass fraction of liver, -",0.0243,0.0139,0.0293,\cite{perdaems2010pred}
+f\_BDM\_stom\_lu,"Lumina as fraction of body mass in stomach, -",0.0036,0.031,0.041,\cite{perdaems2010pred}
+f\_BDM\_duod\_lu,"Lumina as fraction of body mass in duodenum, -",0.0003,0.0001,0.001,\cite{perdaems2010pred}
+f\_BDM\_jeju\_lu,"Lumina as fraction of body mass in jejunum, -",0.0023,0.0018,0.0028,\cite{perdaems2010pred}
+f\_BDM\_ileum\_lu,"Lumina as fraction of body mass in ileum, -",0.0032,0.0027,0.0037,\cite{perdaems2010pred}
+f\_BDM\_cecum\_lu,"Lumina as fraction of body mass in cecum, -",0.0001,0.0001,0.001,\cite{perdaems2010pred}
+f\_BDM\_colon\_lu,"Lumina as fraction of body mass in colon, -",0.0051,0.0046,0.0056,\cite{perdaems2010pred}
+Length\_stom,"Lengths of stomach, dm",2.83,1.981,3.679,\cite{ando2015new}
+Length\_duod,"Lengths of duodenum, dm",1.41,0.987,1.833,\cite{ando2015new}
+Length\_jeju,"Lengths of jejunum, dm",11.68,8.176,15.184,\cite{ando2015new}
+Length\_ileum,"Lengths of ileum, dm",17.52,12.264,22.776,\cite{ando2015new}
+Length\_cecum,"Lengths of cecum, dm",1.7,1.19,2.21,\cite{perdaems2010pred}
+Length\_colon,"Lengths of colon, dm",11,7.7,14.3,\cite{valentin2002basic}
+Radius\_stom,"Radius of stomach, dm",0.967,0.6769,1.2571,\cite{ando2015new}
+Radius\_duod,"Radius of duodenum, dm",0.153,0.1071,0.1989,\cite{ando2015new}
+Radius\_jeju,"Radius of jejunum, dm",0.137,0.0959,0.1781,\cite{ando2015new}
+Radius\_ileum,"Radius of ileum, dm",0.098,0.0686,0.1274,\cite{ando2015new}
+Radius\_cecum,"Radius of cecum, dm",0.35,0.245,0.455,\cite{perdaems2010pred}
+Radius\_colon,"Radius of colon, dm",0.25,0.175,0.325,\cite{perdaems2010pred}
+T12\_stom\_lu,"Transit half-lives in stomach lumina, h",0.25,0.1,0.4,\cite{perdaems2010pred}
+T12\_duod\_lu,"Transit half-lives in duodenum lumina, h",0.25,0.1,0.4,\cite{perdaems2010pred}
+T12\_jeju\_lu,"Transit half-lives in jejunum lumina, h",1.02,0.408,1.632,\cite{perdaems2010pred}
+T12\_ileum\_lu,"Transit half-lives in ileum lumina, h",2.04,0.816,3.264,\cite{perdaems2010pred}
+T12\_cecum\_lu,"Transit half-lives in cecum lumina, h",4.55,1.82,7.28,\cite{perdaems2010pred}
+T12\_colon\_lu,"Transit half-lives in colon lumina, h",13.5,5.4,21.6,\cite{perdaems2010pred}
+pH\_stom,"pH of stomach, -",1.7,1.2,2.2,\cite{perdaems2010pred}
+pH\_duod,"pH of duodenum, -",6,5.5,6.5,\cite{perdaems2010pred}
+pH\_jeju,"pH of jejunum, -",6.5,6,7,\cite{perdaems2010pred}
+pH\_ileum,"pH of ileum, -",7.4,6.9,7.9,\cite{perdaems2010pred}
+pH\_cecum,"Radius of cecum, -",5.9,5.4,6.4,\cite{perdaems2010pred}
+pH\_colon,"Radius of colon, -",7,6.5,7.5,\cite{perdaems2010pred}
+MicroProt\_stom,"Microsomal proteins of stomach, mg/g of tissue",0,0,10,
+MicroProt\_duod,"Microsomal proteinsof duodenum, mg/g of tissue",18,13,23,\cite{paine1997characterization}
+MicroProt\_jeju,"Microsomal proteins of jejunum, mg/g of tissue",25,20,30,\cite{paine1997characterization}
+MicroProt\_ileum,"Microsomal proteins of ileum, mg/g of tissue",4,0,10,\cite{paine1997characterization}
+MicroProt\_cecum,"Microsomal proteins of cecum, mg/g of tissue",0,0,10,
+MicroProt\_colon,"Microsomal proteins of colon, mg/g of tissue",0,0,10,
+MicroProt\_liver,"Microsomal proteins of liver, mg/g of tissue",45,40,50,\cite{houston2012evaluation}
+H\_ep,"Gut epithelium thickness, dm",0.0003,0.00021,0.00039,\cite{ando2015new}

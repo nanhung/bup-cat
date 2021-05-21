@@ -1,0 +1,902 @@
+Integrate (Lsodes, 1e-8, 1e-8, 1);
+
+MCMC ("MCMC.default.out","", # name of output file
+      "",                    # name of data file
+      5,0,                  # iterations, print predictions flag
+      1, 5,                 # printing frequency, iters to print
+      10101010);             # random seed
+
+Level { # Population Level
+  
+  # Dosage forms: 0/1 switches, mutually exclusive,
+  G_delayed_u = 1;
+  
+  # Absorption on(1)/off(0) switches
+  f_Abs_stom  = 0;
+  
+  # Weibull delayed release parameters
+  Weibull_slope_IR = 1; 
+  Weibull_slope_SR = 1; 
+  
+  # Substance-specific parameters (testing) -----------------------------------
+  # Measurment Error
+  Distrib (Ve_C_central, HalfCauchy, 10);
+  Likelihood(C_central_ngml, Normal, Prediction(C_central_ngml), Ve_C_central);
+  
+  Distrib (G_Radius,
+           Uniform,     10, 100);
+  Distrib (Peff,          
+           Uniform,     0.05, 0.31);                   # Melillo et al., 2019; non-informative
+  Distrib (Fu_plasma, 
+           TruncNormal, 0.16, 0.032, 0.064, 0.256);    # CV = 20% Truncation = 3SD  
+  Distrib (Fu_vitro_liver, 
+           TruncNormal, 0.16, 0.032, 0.064, 0.256);    # CV = 20% Truncation = 3SD  
+  Distrib (Kpuu_liver, 
+           LogUniform,  0.5, 5);                       # non-informative  
+  Distrib (Vmax_met_vitro_liver, 
+           TruncLogNormal,  1e-4, 2, 1e-5, 1e-3); 
+  Distrib (V_central_LKg, 
+           TruncNormal, 15,   4.5, 1.5,  28.5);        # 1070 / 70; CV = 30% Truncation = 3SD
+  Distrib (Kc2p, 
+           TruncNormal, 0.10, 0.03,  0.01,  0.19);     # 103 / 1070
+  Distrib (Kp2c,          
+           TruncNormal, 0.04, 0.012, 0.004, 0.076);    # 103 / 2530
+  Distrib (Weibull_scale_IR, 
+           TruncNormal,    0.17, 0.034, 0.068, 0.272); # CV = 20% Truncation = 2SD (vitro: 0.14-0.20)
+  Distrib (Weibull_scale_SR, 
+           TruncNormal,    3.0,  0.6,   1.2,   4.8);   # CV = 20% Truncation = 3SD (vitro: 2.4-3.4)
+  Distrib (Weibull_scale_ER, 
+           TruncNormal,    3.0,  0.6,   1.2,   4.8);   # CV = 20% Truncation = 3SD (vitro: 2.4-3.5)
+  Distrib (Weibull_slope_ER, 
+           TruncNormal,    1.8,  0.18,  1.26,  2.34);  # CV = 10% Truncation = 3SD (vitro: 1.49-2.14)
+  
+  # Variance inter individuals
+  Distrib(Vr_G_Radius,	HalfNormal,	0.3);
+  Distrib(Vr_Peff,	HalfNormal,	0.3);  
+  Distrib(Vr_Fu_plasma,	HalfNormal,	0.3);
+  Distrib(Vr_Fu_vitro_liver,	HalfNormal,	0.3);
+  Distrib(Vr_Kpuu_liver,	HalfNormal,	0.3);
+  Distrib(Vr_Vmax_met_vitro_liver,	HalfNormal,	0.3);
+  Distrib(Vr_V_central_LKg,	HalfNormal,	0.3);
+  Distrib(Vr_Kc2p,	HalfNormal,	0.3);
+  Distrib(Vr_Kp2c,	HalfNormal,	0.3);
+  Distrib(Vr_Weibull_scale_IR, HalfNormal, 0.3);
+  Distrib(Vr_Weibull_scale_SR, HalfNormal, 0.3);
+  Distrib(Vr_Weibull_scale_ER, HalfNormal, 0.3);
+  Distrib(Vr_Weibull_slope_ER, HalfNormal, 0.3);
+  
+  # Variance intra individuals
+  Distrib(Va_Peff,	HalfNormal,	0.1);
+  Distrib(Va_Vmax_met_vitro_liver,	HalfNormal,	0.1);
+  Distrib(Va_V_central_LKg,	HalfNormal,	0.1);
+  Distrib(Va_Kc2p,	HalfNormal,	0.1);
+  Distrib(Va_Kp2c,	HalfNormal,	0.1);
+  
+  Level { # Inter-individual --------------------------------------------------------
+    
+    Distrib ( G_Radius,
+              TruncLogNormal_v, G_Radius,       Vr_G_Radius,       10, 100);
+    Distrib ( Peff, 
+              TruncLogNormal_v, Peff,           Vr_Peff,           0.05,  0.31);
+    Distrib ( Fu_plasma, 
+              TruncLogNormal_v, Fu_plasma,      Vr_Fu_plasma,      0.064, 0.256);
+    Distrib ( Fu_vitro_liver, 
+              TruncLogNormal_v, Fu_vitro_liver, Vr_Fu_vitro_liver, 0.064, 0.256);
+    Distrib ( Kpuu_liver, 
+              TruncLogNormal_v, Kpuu_liver,     Vr_Kpuu_liver,     0.5, 5); 
+    Distrib ( Vmax_met_vitro_liver, 
+              TruncLogNormal_v,  Vmax_met_vitro_liver, Vr_Vmax_met_vitro_liver, 1e-5, 1e-3); 
+    Distrib ( V_central_LKg, 
+              TruncLogNormal_v, V_central_LKg,  Vr_V_central_LKg,  1.5, 28.5);
+    Distrib ( Kc2p, 
+              TruncLogNormal_v, Kc2p,           Vr_Kc2p,           0.01, 0.19);
+    Distrib ( Kp2c, 
+              TruncLogNormal_v, Kp2c,           Vr_Kp2c,           0.004, 0.076);
+    Distrib ( Weibull_scale_IR, 
+              TruncLogNormal_v, Weibull_scale_IR, Vr_Weibull_scale_IR, 0.068, 0.272);
+    Distrib ( Weibull_scale_SR, 
+              TruncLogNormal_v, Weibull_scale_SR, Vr_Weibull_scale_SR, 1.2,   4.8);
+    Distrib ( Weibull_scale_ER, 
+              TruncLogNormal_v, Weibull_scale_ER, Vr_Weibull_scale_ER, 1.2,   4.8);
+    Distrib ( Weibull_slope_ER,
+              TruncLogNormal_v, Weibull_slope_ER, Vr_Weibull_slope_ER, 1.26,  2.34);
+    
+    
+    Level { # individual 3 M ------------------------------------------------------------
+      
+      BDM = 73.4; 
+      
+      Distrib ( Peff, 
+                TruncLogNormal_v, Peff,           Va_Peff,           0.05,  0.31);      
+      Distrib ( Vmax_met_vitro_liver, 
+                TruncLogNormal_v, Vmax_met_vitro_liver, Va_Vmax_met_vitro_liver, 1e-5, 1e-3); 
+      Distrib ( V_central_LKg, 
+                TruncLogNormal_v, V_central_LKg,  Va_V_central_LKg,  1.5, 28.5);
+      Distrib ( Kc2p, 
+                TruncLogNormal_v, Kc2p,           Va_Kc2p,           0.01, 0.19);
+      Distrib ( Kp2c, 
+                TruncLogNormal_v, Kp2c,           Va_Kp2c,           0.004, 0.076);
+      
+      Experiment { # Experiment IR 75
+        R_type = 0;
+        Q_to_release = 312.8389;
+        Print ( C_central_ngml,  0.50  1.00  2.00  3.00  4.00  6.00  8.00 24.00 );
+        Data  ( C_central_ngml, 18.70 94.40 68.80 43.50 34.40 13.60 10.90  2.53 );
+      }
+      Experiment { # Experiment IR 100
+        R_type = 0;
+        Q_to_release = 417.1185;
+        Print ( C_central_ngml,  0.50   1.00   2.00   3.00   4.00   6.00   8.00  48.00 );
+        Data  ( C_central_ngml, 45.40 101.00  87.90  78.10  52.70  26.60  22.10   1.02 );
+      }
+      Experiment { # Experiment SR 100
+        R_type = 1;
+        Q_to_release = 417.1185;
+        Print ( C_central_ngml,  0.50  1.00  1.50  3.00  4.00  6.00  8.00 );
+        Data  ( C_central_ngml, 45.40 59.80 57.00 53.70 26.90 18.60  3.31 );
+      }
+      Experiment { # Experiment SR 150
+        R_type = 1;
+        Q_to_release = 625.6778;  
+        Print ( C_central_ngml,  0.50  1.00  1.50  2.00  4.00  6.00  8.00 24.00 );
+        Data  ( C_central_ngml, 21.30 68.10 67.80 56.50 41.80 37.80  7.01  1.65 );
+      }
+      Experiment { # Experiment ER 150
+        R_type = 2;
+        Q_to_release = 625.6778;  
+        Print ( C_central_ngml,  1.50  2.00  4.00  6.00  8.00 24.00 48.00 );
+        Data  ( C_central_ngml, 21.10 59.50 98.60 76.60 57.20 11.50  2.05 );
+      }
+      Experiment { # Experiment ER 300
+        R_type = 2;
+        Q_to_release = 1251.356;  
+        Print ( C_central_ngml,  1.00   1.50   2.00   4.00   6.00   8.00  24.00  48.00 );
+        Data  ( C_central_ngml,  7.83  74.20 101.00 147.00  65.90  18.90   6.92   2.40 );
+      }
+    } # End individual 3
+    
+    Level { # individual 4 M ------------------------------------------------------------
+      
+      BDM = 79.8; 
+      
+      Distrib ( Peff, 
+                TruncLogNormal_v, Peff,           Va_Peff,           0.05,  0.31);      
+      Distrib ( Vmax_met_vitro_liver, 
+                TruncLogNormal_v, Vmax_met_vitro_liver, Va_Vmax_met_vitro_liver, 1e-5, 1e-3); 
+      Distrib ( V_central_LKg, 
+                TruncLogNormal_v, V_central_LKg,  Va_V_central_LKg,  1.5, 28.5);
+      Distrib ( Kc2p, 
+                TruncLogNormal_v, Kc2p,           Va_Kc2p,           0.01, 0.19);
+      Distrib ( Kp2c, 
+                TruncLogNormal_v, Kp2c,           Va_Kp2c,           0.004, 0.076);
+      
+      Experiment { # Experiment IR 75
+        R_type = 0;
+        Q_to_release = 312.8389;
+        Print (C_central_ngml, 0.50  1.00  2.00  3.00  4.00  6.00  8.00 24.00 );
+        Data  (C_central_ngml, 2.52 18.50 65.70 47.70 26.60 16.30 10.20  2.61 );
+      }
+      Experiment { # Experiment IR 100
+        R_type = 0;
+        Q_to_release = 417.1185;
+        Print (C_central_ngml,   0.5   1.0   2.0   3.0   4.0   6.0   8.0  24.0 );
+        Data  (C_central_ngml, 361.0 124.0 101.0  73.8  55.3  26.3  22.2   3.2 );
+      }
+      Experiment { # Experiment SR 100
+        R_type = 1;
+        Q_to_release = 417.1185;
+        Print (C_central_ngml,   0.25  0.50  1.00  1.50  3.00  4.00  6.00  8.00 24.00 );
+        Data ( C_central_ngml,  10.50 79.00 54.70 59.50 51.00 32.20 30.40  5.97  2.63 );
+      }
+      Experiment { # Experiment SR 150
+        R_type = 1;
+        Q_to_release = 625.6778;  
+        Print (C_central_ngml,  0.25  0.50  1.00  1.50  2.00  4.00  6.00  8.00 );
+        Data ( C_central_ngml, 62.40 54.80 60.60 68.70 64.80 54.30 30.90  8.42 );
+      }
+      Experiment { # Experiment ER 150
+        R_type = 2;
+        Q_to_release = 625.6778;  
+        Print (C_central_ngml,  1.00  1.50  2.00  4.00  6.00  8.00 24.00 48.00 );
+        Data ( C_central_ngml, 32.90 52.90 52.80 28.00 39.00 27.90 11.70  3.54 );
+      }
+      Experiment { # Experiment ER 300
+        R_type = 2;
+        Q_to_release = 1251.356;  
+        Print (C_central_ngml,  1.50  2.00  4.00  6.00  8.00 48.00 );
+        Data ( C_central_ngml, 20.20 46.70 57.50 33.10 23.00  2.53 );
+      }
+    } # End individual 4
+    
+    Level { # individual 5 F ------------------------------------------------------------
+      
+      BDM = 91.1; 
+      
+      Distrib ( Peff, 
+                TruncLogNormal_v, Peff,           Va_Peff,           0.05,  0.31);      
+      Distrib ( Vmax_met_vitro_liver, 
+                TruncLogNormal_v, Vmax_met_vitro_liver, Va_Vmax_met_vitro_liver, 1e-5, 1e-3); 
+      Distrib ( V_central_LKg, 
+                TruncLogNormal_v, V_central_LKg,  Va_V_central_LKg,  1.5, 28.5);
+      Distrib ( Kc2p, 
+                TruncLogNormal_v, Kc2p,           Va_Kc2p,           0.01, 0.19);
+      Distrib ( Kp2c, 
+                TruncLogNormal_v, Kp2c,           Va_Kp2c,           0.004, 0.076);
+      
+      Experiment { # Experiment IR 75
+        R_type = 0;
+        Q_to_release = 312.8389;
+        Print (C_central_ngml,  0.50  1.00  2.00  3.00  4.00  6.00  8.00 24.00 );
+        Data  (C_central_ngml, 43.80 92.60 36.80 31.60 13.30  8.37  6.06  2.72 );
+      }
+      Experiment { # Experiment IR 100
+        R_type = 0;
+        Q_to_release = 417.1185;
+        Print (C_central_ngml,  0.50  0.75  1.00  1.50  2.00  3.00  4.00  6.00  8.00 24.00 48.00 );
+        Data  (C_central_ngml, 60.60 96.20 82.30 96.70 64.50 49.70 36.70 23.70 15.00  5.38  2.21 );
+      }
+      Experiment { # Experiment SR 100
+        R_type = 1;
+        Q_to_release = 417.1185;
+        Print (C_central_ngml,  0.50  1.00  1.50  3.00  4.00  6.00  8.00 );
+        Data ( C_central_ngml, 78.90 95.60 75.40 51.70 21.20 14.30  4.51 );
+      }
+      Experiment { # Experiment SR 150
+        R_type = 1;
+        Q_to_release = 625.6778;  
+        Print (C_central_ngml,  0.25  0.50  1.00  1.50  2.00  4.00  6.00  8.00 24.00 48.00 );
+        Data ( C_central_ngml, 16.90 40.90 48.90 44.00 34.60 29.40 27.60 13.90  9.90  3.60 );
+      }
+      Experiment { # Experiment ER 150
+        R_type = 2;
+        Q_to_release = 625.6778;  
+        Print (C_central_ngml, 0.25  0.50  1.00  1.50  2.00  4.00  6.00  8.00 24.00 48.00 72.00 96.00 );
+        Data ( C_central_ngml, 5.10  6.42  4.02  6.94 27.70 26.50 19.00 23.20 13.10  7.89  5.94  5.00 );
+      }
+      Experiment { # Experiment ER 300
+        R_type = 2;
+        Q_to_release = 1251.356;  
+        Print (C_central_ngml, 1.00  1.50  2.00  4.00  6.00  8.00 24.00 48.00 );
+        Data ( C_central_ngml, 5.92 17.50 37.40 24.10 30.50 17.50  8.72  2.83 );
+      }
+    } # End individual 5
+    
+    Level { # individual 6 F ------------------------------------------------------------
+      
+      BDM = 74.0; 
+      
+      Distrib ( Peff, 
+                TruncLogNormal_v, Peff,           Va_Peff,           0.05,  0.31);      
+      Distrib ( Vmax_met_vitro_liver, 
+                TruncLogNormal_v, Vmax_met_vitro_liver, Va_Vmax_met_vitro_liver, 1e-5, 1e-3); 
+      Distrib ( V_central_LKg, 
+                TruncLogNormal_v, V_central_LKg,  Va_V_central_LKg,  1.5, 28.5);
+      Distrib ( Kc2p, 
+                TruncLogNormal_v, Kc2p,           Va_Kc2p,           0.01, 0.19);
+      Distrib ( Kp2c, 
+                TruncLogNormal_v, Kp2c,           Va_Kp2c,           0.004, 0.076);
+      
+      Experiment { # Experiment IR 75
+        R_type = 0;
+        Q_to_release = 312.8389;
+        Print (C_central_ngml,  1.00  2.00  3.00  4.00  6.00  8.00 );
+        Data  (C_central_ngml, 67.20 55.60 31.90 17.90  8.17  5.55 );
+      }
+      Experiment { # Experiment IR 100
+        R_type = 0;
+        Q_to_release = 417.1185;
+        Print (C_central_ngml,  1.00  2.00  3.00  4.00  6.00  8.00 );
+        Data  (C_central_ngml, 73.70 31.10 30.60 19.20 10.90  8.39 );
+      }
+      Experiment { # Experiment SR 100
+        R_type = 1;
+        Q_to_release = 417.1185;
+        Print (C_central_ngml, 0.5  1.0  1.5  3.0  4.0  6.0  8.0 );
+        Data ( C_central_ngml, 26.6 29.5 28.3 36.1 33.7 15.6  3.0 );
+      }
+      Experiment { # Experiment SR 150
+        R_type = 1;
+        Q_to_release = 625.6778;  
+        Print (C_central_ngml, 0.25  0.50  1.00  1.50  2.00  4.00  6.00  8.00 );
+        Data ( C_central_ngml, 3.05 50.00 40.00 35.70 33.80 26.10 14.30  1.72 );
+      }
+      Experiment { # Experiment ER 150
+        R_type = 2;
+        Q_to_release = 625.6778;  
+        Print (C_central_ngml,  1.00  1.50  2.00  4.00  6.00  8.00 24.00 );
+        Data ( C_central_ngml, 17.40 68.40 33.10 13.70 12.30 11.60  1.81 );
+      }
+      Experiment { # Experiment ER 300
+        R_type = 2;
+        Q_to_release = 1251.356;  
+        Print (C_central_ngml, 1.00  1.50  2.00  4.00  6.00  8.00 24.00 );
+        Data ( C_central_ngml, 3.31 56.20 44.40 31.30 28.70 14.70  3.20 );
+      }
+    } # End individual 6
+    
+    Level { # individual 7 M ------------------------------------------------------------
+      
+      BDM = 77.7; 
+      
+      Distrib ( Peff, 
+                TruncLogNormal_v, Peff,           Va_Peff,           0.05,  0.31);      
+      Distrib ( Vmax_met_vitro_liver, 
+                TruncLogNormal_v, Vmax_met_vitro_liver, Va_Vmax_met_vitro_liver, 1e-5, 1e-3); 
+      Distrib ( V_central_LKg, 
+                TruncLogNormal_v, V_central_LKg,  Va_V_central_LKg,  1.5, 28.5);
+      Distrib ( Kc2p, 
+                TruncLogNormal_v, Kc2p,           Va_Kc2p,           0.01, 0.19);
+      Distrib ( Kp2c, 
+                TruncLogNormal_v, Kp2c,           Va_Kp2c,           0.004, 0.076);
+      
+      Experiment { # Experiment IR 75
+        R_type = 0;
+        Q_to_release = 312.8389;
+        Print (C_central_ngml,  0.50   1.00   2.00   3.00   4.00   6.00   8.00  48.00 );
+        Data  (C_central_ngml, 39.80 130.00  77.00  49.20  28.40  21.10  19.60   2.08 );
+      }
+      Experiment { # Experiment IR 100
+        R_type = 0;
+        Q_to_release = 417.1185;
+        Print (C_central_ngml,  0.50  1.00  2.00  3.00  4.00  6.00  8.00 24.00 );
+        Data  (C_central_ngml, 30.20 80.20 71.40 58.30 45.10 24.20 13.50  3.92 );
+      }
+      Experiment { # Experiment SR 100
+        R_type = 1;
+        Q_to_release = 417.1185;
+        Print (C_central_ngml, 0.25  0.50  1.00  1.50  3.00  4.00  6.00  8.00 );
+        Data ( C_central_ngml, 7.53 25.90 22.90 49.80 45.20 31.40 25.90  4.40 );
+      }
+      Experiment { # Experiment SR 150
+        R_type = 1;
+        Q_to_release = 625.6778;  
+        Print (C_central_ngml,  0.50  1.00  1.50  2.00  4.00  6.00  8.00 );
+        Data ( C_central_ngml, 19.20 52.50 54.20 63.40 42.50 46.80  6.05 );
+      }
+      Experiment { # Experiment ER 150
+        R_type = 2;
+        Q_to_release = 625.6778;  
+        Print (C_central_ngml,  1.00  1.50  2.00  4.00  6.00  8.00 24.00 );
+        Data ( C_central_ngml, 14.20 22.50 37.10 26.20 17.50 15.30  5.74 );
+      }
+      Experiment { # Experiment ER 300
+        R_type = 2;
+        Q_to_release = 1251.356;  
+        Print (C_central_ngml,  2.00  4.00  6.00  8.00 24.00 48.00 );
+        Data ( C_central_ngml, 46.50 80.40 57.50 41.20 12.10  5.79 );
+      }
+    } # End individual 7
+    
+    Level { # individual 8 F ------------------------------------------------------------
+      
+      BDM = 73.5; 
+      
+      Distrib ( Peff, 
+                TruncLogNormal_v, Peff,           Va_Peff,           0.05,  0.31);      
+      Distrib ( Vmax_met_vitro_liver, 
+                TruncLogNormal_v, Vmax_met_vitro_liver, Va_Vmax_met_vitro_liver, 1e-5, 1e-3); 
+      Distrib ( V_central_LKg, 
+                TruncLogNormal_v, V_central_LKg,  Va_V_central_LKg,  1.5, 28.5);
+      Distrib ( Kc2p, 
+                TruncLogNormal_v, Kc2p,           Va_Kc2p,           0.01, 0.19);
+      Distrib ( Kp2c, 
+                TruncLogNormal_v, Kp2c,           Va_Kp2c,           0.004, 0.076);
+      
+      Experiment { # Experiment IR 75
+        R_type = 0;
+        Q_to_release = 312.8389;
+        Print (C_central_ngml, 0.50  1.00  2.00  3.00  4.00  6.00  8.00 24.00 );
+        Data ( C_central_ngml, 8.64 42.90 65.80 57.00 59.20 24.00 10.50  2.78 );
+      }
+      Experiment { # Experiment IR 100
+        R_type = 0;
+        Q_to_release = 417.1185;
+        Print (C_central_ngml,  1.0  2.0  3.0  4.0  6.0  8.0 24.0 );
+        Data  (C_central_ngml, 77.0 39.7 40.0 37.2 28.6 26.9 17.9 );
+      }
+      Experiment { # Experiment SR 100
+        R_type = 1;
+        Q_to_release = 417.1185;
+        Print (C_central_ngml,  0.50  1.00  1.50  3.00  4.00  6.00  8.00 );
+        Data ( C_central_ngml, 17.50 29.80 26.10 40.70 46.70 35.50  3.47 );
+      }
+      Experiment { # Experiment SR 150
+        R_type = 1;
+        Q_to_release = 625.6778;  
+        Print (C_central_ngml, 0.25  0.50  1.00  1.50  2.00  4.00  6.00  8.00 );
+        Data ( C_central_ngml, 3.75 13.50 21.70 20.20 21.80 15.50 16.60  6.26 );
+      }
+      Experiment { # Experiment ER 150
+        R_type = 2;
+        Q_to_release = 625.6778;  
+        Print (C_central_ngml, 1.00  1.50  2.00  4.00  6.00  8.00 24.00 );
+        Data ( C_central_ngml, 5.68 16.40 20.80 18.70 21.60 17.80  5.90 );
+      }
+      Experiment { # Experiment ER 300
+        R_type = 2;
+        Q_to_release = 1251.356;  
+        Print (C_central_ngml,  1.50  2.00  4.00  6.00  8.00 24.00 48.00 );
+        Data  (C_central_ngml, 15.00 15.20 31.60 30.60 34.60  8.13  3.27 );
+      }
+    } # End individual 8
+    
+    Level { # individual 9 M ------------------------------------------------------------
+      
+      BDM = 80.6; 
+      
+      Distrib ( Peff, 
+                TruncLogNormal_v, Peff,           Va_Peff,           0.05,  0.31);      
+      Distrib ( Vmax_met_vitro_liver, 
+                TruncLogNormal_v, Vmax_met_vitro_liver, Va_Vmax_met_vitro_liver, 1e-5, 1e-3); 
+      Distrib ( V_central_LKg, 
+                TruncLogNormal_v, V_central_LKg,  Va_V_central_LKg,  1.5, 28.5);
+      Distrib ( Kc2p, 
+                TruncLogNormal_v, Kc2p,           Va_Kc2p,           0.01, 0.19);
+      Distrib ( Kp2c, 
+                TruncLogNormal_v, Kp2c,           Va_Kp2c,           0.004, 0.076);
+      
+      Experiment { # Experiment IR 75
+        R_type = 0;
+        Q_to_release = 312.8389;
+        Print (C_central_ngml,  1.00  2.00  3.00  4.00  6.00  8.00 24.00 48.00 );
+        Data  (C_central_ngml, 22.60 49.70 53.20 53.90 60.60 24.90 18.20  1.81 );
+      }
+      Experiment { # Experiment IR 100
+        R_type = 0;
+        Q_to_release = 417.1185;
+        Print (C_central_ngml,  1.00  2.00  3.00  4.00  6.00  8.00 24.00 );
+        Data  (C_central_ngml, 48.00 48.20 61.80 54.60 38.00 26.40  4.52 );
+      }
+      Experiment { # Experiment SR 100
+        R_type = 1;
+        Q_to_release = 417.1185;
+        Print (C_central_ngml, 0.50  1.00  1.50  3.00  4.00  6.00  8.00 );
+        Data ( C_central_ngml, 7.92 65.20 73.00 80.60 70.70 46.30  2.83 );
+      }
+      Experiment { # Experiment SR 150
+        R_type = 1;
+        Q_to_release = 625.6778;  
+        Print (C_central_ngml, 0.50  1.00  1.50  2.00  4.00  6.00  8.00 );
+        Data ( C_central_ngml, 4.42 27.70 36.30 33.90 37.20 39.90  7.41 );
+      }
+      Experiment { # Experiment ER 150
+        R_type = 2;
+        Q_to_release = 625.6778;  
+        Print (C_central_ngml,  1.5  2.0  4.0  6.0  8.0 24.0 );
+        Data ( C_central_ngml, 14.4 28.5 36.6 32.1 19.2  8.7 );
+      }
+      Experiment { # Experiment ER 300
+        R_type = 2;
+        Q_to_release = 1251.356;  
+        Print (C_central_ngml,  1.50  2.00  4.00  6.00  8.00 24.00 );
+        Data ( C_central_ngml, 29.90 48.90 60.90 58.10 33.90  9.37 );
+      }
+    } # End individual 9
+    
+    Level { # individual 16 M ------------------------------------------------------------
+      
+      BDM = 67.9; 
+      
+      Distrib ( Peff, 
+                TruncLogNormal_v, Peff,           Va_Peff,           0.05,  0.31);      
+      Distrib ( Vmax_met_vitro_liver, 
+                TruncLogNormal_v, Vmax_met_vitro_liver, Va_Vmax_met_vitro_liver, 1e-5, 1e-3); 
+      Distrib ( V_central_LKg, 
+                TruncLogNormal_v, V_central_LKg,  Va_V_central_LKg,  1.5, 28.5);
+      Distrib ( Kc2p, 
+                TruncLogNormal_v, Kc2p,           Va_Kc2p,           0.01, 0.19);
+      Distrib ( Kp2c, 
+                TruncLogNormal_v, Kp2c,           Va_Kp2c,           0.004, 0.076);
+      
+      Experiment { # Experiment IR 75
+        R_type = 0;
+        Q_to_release = 312.8389;
+        Print (C_central_ngml,  0.50  0.75  1.00  1.50  2.00  3.00  4.00  6.00  8.00 24.00 48.00 );
+        Data  (C_central_ngml, 21.00 52.30 58.40 62.60 54.30 23.90 15.80  7.45  8.20  2.90  1.42 );
+      }
+      Experiment { # Experiment IR 100
+        R_type = 0;
+        Q_to_release = 417.1185;
+        Print (C_central_ngml, 0.50  1.00  2.00  3.00  4.00  6.00  8.00 24.00 48.00 );
+        Data  (C_central_ngml, 3.26 62.60 58.80 32.90 23.30 17.60 14.50  4.41  1.20 );
+      }
+      Experiment { # Experiment SR 100
+        R_type = 1;
+        Q_to_release = 417.1185;
+        Print (C_central_ngml,  0.50  0.75  1.00  1.50  2.00  3.00  4.00  6.00  8.00 24.00  );
+        Data ( C_central_ngml, 46.90 51.90 71.20 79.20 68.20 67.40 72.40 44.80  7.15  3.18  );
+      }
+      Experiment { # Experiment SR 150
+        R_type = 1;
+        Q_to_release = 625.6778;  
+        Print (C_central_ngml,  0.50  0.75  1.00  1.50  2.00  3.00  4.00  6.00  8.00 24.00  );
+        Data ( C_central_ngml, 59.00 41.70 45.50 56.70 48.20 24.10 22.30 18.70  3.48  3.13  );
+      }
+      Experiment { # Experiment ER 150
+        R_type = 2;
+        Q_to_release = 625.6778;  
+        Print (C_central_ngml, 1.00  1.50  2.00  4.00  6.00  8.00 24.00 );
+        Data ( C_central_ngml, 5.59 10.90 24.20 16.60 14.10  9.53  3.23 );
+      }
+      Experiment { # Experiment ER 300
+        R_type = 2;
+        Q_to_release = 1251.356;  
+        Print (C_central_ngml, 0.75   1.00   1.50   2.00   3.00   4.00   6.00   8.00  24.00  48.00  72.00 );
+        Data ( C_central_ngml, 8.21  73.70 189.00 231.00 171.00 131.00  75.90  32.20  15.00   6.27   4.94 );
+      }
+    } # End individual 16
+    
+    Level { # individual 20 M ------------------------------------------------------------
+      
+      BDM = 93.3; 
+      
+      Distrib ( Peff, 
+                TruncLogNormal_v, Peff,           Va_Peff,           0.05,  0.31);      
+      Distrib ( Vmax_met_vitro_liver, 
+                TruncLogNormal_v, Vmax_met_vitro_liver, Va_Vmax_met_vitro_liver, 1e-5, 1e-3); 
+      Distrib ( V_central_LKg, 
+                TruncLogNormal_v, V_central_LKg,  Va_V_central_LKg,  1.5, 28.5);
+      Distrib ( Kc2p, 
+                TruncLogNormal_v, Kc2p,           Va_Kc2p,           0.01, 0.19);
+      Distrib ( Kp2c, 
+                TruncLogNormal_v, Kp2c,           Va_Kp2c,           0.004, 0.076);
+      
+      Experiment { # Experiment IR 75
+        R_type = 0;
+        Q_to_release = 312.8389;
+        Print (C_central_ngml,   0.50   0.75   1.00   1.50   2.00   3.00   4.00   6.00   8.00  24.00 );
+        Data  (C_central_ngml, 108.00 110.00  92.40  61.60  45.70  23.20  17.60  18.40  13.00   1.38 );
+      }
+      Experiment { # Experiment IR 100
+        R_type = 0;
+        Q_to_release = 417.1185;
+        Print (C_central_ngml,  0.25   0.50   0.75   1.00   1.50   2.00   3.00   4.00   6.00   8.00  24.00  );
+        Data  (C_central_ngml, 12.50 169.00 118.00 100.00  68.30  51.20  41.00  30.60  16.30  12.10   1.90  );
+      }
+      Experiment { # Experiment SR 100
+        R_type = 1;
+        Q_to_release = 417.1185;
+        Print (C_central_ngml,  0.50  0.75  1.00  1.50  2.00  3.00  4.00  6.00  8.00 );
+        Data ( C_central_ngml, 16.30 30.20 26.80 22.10 20.50 22.70 18.40 22.40  2.97 );
+      }
+      Experiment { # Experiment SR 150
+        R_type = 1;
+        Q_to_release = 625.6778;  
+        Print (C_central_ngml,  0.25  0.50  0.75  1.00  1.50  2.00  3.00  4.00  6.00  8.00 );
+        Data ( C_central_ngml, 10.60 34.10 74.20 48.70 41.40 62.50 42.40 53.70 33.30  6.10 );
+      }
+      Experiment { # Experiment ER 150
+        R_type = 2;
+        Q_to_release = 625.6778;  
+        Print (C_central_ngml,  1.50  2.00  3.00  4.00  6.00  8.00 24.00 );
+        Data ( C_central_ngml, 13.00 36.80 37.20 25.90 18.30 14.70  5.71 );
+      }
+      Experiment { # Experiment ER 300
+        R_type = 2;
+        Q_to_release = 1251.356;  
+        Print (C_central_ngml, 1.50   2.00   3.00   4.00   6.00   8.00  24.00  48.00 );
+        Data ( C_central_ngml,57.70 103.00 136.00  72.20  54.10  45.80  18.30   3.11 );
+      }
+    } # End individual 20
+    
+    Level { # individual 27 F ------------------------------------------------------------
+      
+      BDM = 72.9; 
+      
+      Distrib ( Peff, 
+                TruncLogNormal_v, Peff,           Va_Peff,           0.05,  0.31);      
+      Distrib ( Vmax_met_vitro_liver, 
+                TruncLogNormal_v, Vmax_met_vitro_liver, Va_Vmax_met_vitro_liver, 1e-5, 1e-3); 
+      Distrib ( V_central_LKg, 
+                TruncLogNormal_v, V_central_LKg,  Va_V_central_LKg,  1.5, 28.5);
+      Distrib ( Kc2p, 
+                TruncLogNormal_v, Kc2p,           Va_Kc2p,           0.01, 0.19);
+      Distrib ( Kp2c, 
+                TruncLogNormal_v, Kp2c,           Va_Kp2c,           0.004, 0.076);
+      
+      Experiment { # Experiment IR 75
+        R_type = 0;
+        Q_to_release = 312.8389;
+        Print (C_central_ngml,  0.50   0.75   1.00   1.50   2.00  3.00   4.00   6.00   8.00  24.00 );
+        Data  (C_central_ngml, 11.60  27.70  53.10  80.50 136.00 25.00  42.30  26.50  14.70   6.15 );
+      }
+      Experiment { # Experiment IR 100
+        R_type = 0;
+        Q_to_release = 417.1185;
+        Print (C_central_ngml, 0.25   0.50   0.75   1.00   1.50   2.00   3.00   4.00   6.00   8.00  24.00  48.00  72.00  96.00 );
+        Data  (C_central_ngml, 2.59  88.20 188.00 281.00 328.00 273.00 198.00 150.00  81.90  60.60  16.80   7.16   4.47   3.33 );
+      }
+      Experiment { # Experiment SR 100
+        R_type = 1;
+        Q_to_release = 417.1185;
+        Print (C_central_ngml,  0.50  0.75  1.00  1.50  2.00  3.00  4.00  6.00  8.00  );
+        Data ( C_central_ngml, 17.50 36.70 40.60 52.90 64.20 94.00 65.50 36.90  5.40  );
+      }
+      Experiment { # Experiment SR 150
+        R_type = 1;
+        Q_to_release = 625.6778;  
+        Print (C_central_ngml, 0.25   0.50   0.75   1.00   1.50   2.00   3.00   4.00   6.00   8.00  48.00 );
+        Data ( C_central_ngml, 5.57  51.50  95.90  91.10 103.00  90.30  94.10  85.10  67.20   5.93   4.69 );
+      }
+      Experiment { # Experiment ER 150
+        R_type = 2;
+        Q_to_release = 625.6778;  
+        Print (C_central_ngml,  1.00   1.50   2.00   3.00   4.00   6.00   8.00  24.00  48.00 );
+        Data ( C_central_ngml,  8.88  22.50  56.40 103.00  91.70  76.30  37.60  10.20   1.88 );
+      }
+      Experiment { # Experiment ER 300
+        R_type = 2;
+        Q_to_release = 1251.356;  
+        Print (C_central_ngml,  1.00   1.50   2.00   3.00   4.00   6.00   8.00  24.00 );
+        Data ( C_central_ngml,  7.15  16.90  50.10 171.00 149.00 133.00  74.50  22.00 );
+      }
+    } # End individual 27
+    
+    Level { # individual 28 F ------------------------------------------------------------
+      
+      BDM = 83.8; 
+      
+      Distrib ( Peff, 
+                TruncLogNormal_v, Peff,           Va_Peff,           0.05,  0.31);      
+      Distrib ( Vmax_met_vitro_liver, 
+                TruncLogNormal_v, Vmax_met_vitro_liver, Va_Vmax_met_vitro_liver, 1e-5, 1e-3); 
+      Distrib ( V_central_LKg, 
+                TruncLogNormal_v, V_central_LKg,  Va_V_central_LKg,  1.5, 28.5);
+      Distrib ( Kc2p, 
+                TruncLogNormal_v, Kc2p,           Va_Kc2p,           0.01, 0.19);
+      Distrib ( Kp2c, 
+                TruncLogNormal_v, Kp2c,           Va_Kp2c,           0.004, 0.076);
+      
+      Experiment { # Experiment IR 75
+        R_type = 0;
+        Q_to_release = 312.8389;
+        Print (C_central_ngml,  0.50   0.75   1.00   1.50   2.00   3.00   4.00   6.00   8.00  24.00  48.00 );
+        Data  (C_central_ngml, 48.50 183.00 127.00  93.90  78.40  38.30  26.00  14.90  12.70   3.97   1.92  );
+      }
+      Experiment { # Experiment IR 100
+        R_type = 0;
+        Q_to_release = 417.1185;
+        Print (C_central_ngml,  0.50   0.75   1.00   1.50   2.00   3.00   4.00   6.00   8.00 );
+        Data  (C_central_ngml, 17.20  73.40 121.00 110.00  99.10  82.80  54.90   9.77  13.10 );
+      }
+      Experiment { # Experiment SR 100
+        R_type = 1;
+        Q_to_release = 417.1185;
+        Print (C_central_ngml, 0.25  0.50  0.75  1.00  1.50  2.00  3.00  4.00  6.00  8.00 24.00 48.00 72.00 );
+        Data ( C_central_ngml, 3.65 42.40 50.70 64.50 43.80 43.30 56.20 46.80 24.50  4.83  3.26  1.92  2.06 );
+      }
+      Experiment { # Experiment SR 150
+        R_type = 1;
+        Q_to_release = 625.6778;  
+        Print (C_central_ngml,  0.75  1.00  1.50  2.00  3.00  4.00  6.00  8.00 24.00 );
+        Data ( C_central_ngml, 22.60 30.10 41.60 30.10 30.70 25.40 32.20  9.05  4.76 );
+      }
+      Experiment { # Experiment ER 150
+        R_type = 2;
+        Q_to_release = 625.6778;  
+        Print (C_central_ngml, 1.00  1.50  2.00  3.00  4.00  6.00  8.00 24.00 48.00 );
+        Data ( C_central_ngml, 9.14 23.80 24.60 30.50 31.20 24.80 17.40  5.88  1.11 );
+      }
+      Experiment { # Experiment ER 300
+        R_type = 2;
+        Q_to_release = 1251.356;  
+        Print (C_central_ngml, 0.25   0.50   0.75   1.00   1.50   2.00   3.00   4.00   6.00  24.00  48.00  72.00 );
+        Data ( C_central_ngml, 4.31   4.59   6.12  12.40 28.90  83.80  133.00  99.30 102.00  11.00   5.64   4.61 );
+      }
+    } # End individual 28
+    
+    Level { # individual 29 M ------------------------------------------------------------
+      
+      BDM = 75.3; 
+      
+      Distrib ( Peff, 
+                TruncLogNormal_v, Peff,           Va_Peff,           0.05,  0.31);      
+      Distrib ( Vmax_met_vitro_liver, 
+                TruncLogNormal_v, Vmax_met_vitro_liver, Va_Vmax_met_vitro_liver, 1e-5, 1e-3); 
+      Distrib ( V_central_LKg, 
+                TruncLogNormal_v, V_central_LKg,  Va_V_central_LKg,  1.5, 28.5);
+      Distrib ( Kc2p, 
+                TruncLogNormal_v, Kc2p,           Va_Kc2p,           0.01, 0.19);
+      Distrib ( Kp2c, 
+                TruncLogNormal_v, Kp2c,           Va_Kp2c,           0.004, 0.076);
+      
+      Experiment { # Experiment IR 75
+        R_type = 0;
+        Q_to_release = 312.8389;
+        Print (C_central_ngml, 0.25  0.50  0.75  1.00  1.50  2.00  3.00  4.00  6.00  8.00 24.00  );
+        Data  (C_central_ngml, 4.30  4.48 45.80 95.40 70.80 54.10 39.90 20.50  8.40  6.78  4.73  );
+      }
+      Experiment { # Experiment IR 100
+        R_type = 0;
+        Q_to_release = 417.1185;
+        Print (C_central_ngml,  0.75  1.00  1.50  2.00  3.00  4.00  6.00  8.00  );
+        Data  (C_central_ngml, 22.50 46.00 62.20 46.50 38.10 25.70 16.10 10.60  );
+      }
+      Experiment { # Experiment SR 100
+        R_type = 1;
+        Q_to_release = 417.1185;
+        Print (C_central_ngml,  0.75  1.00  1.50  2.00  3.00  4.00  6.00  8.00 24.00  );
+        Data ( C_central_ngml, 31.80 30.40 43.10 37.90 32.30 59.70 39.90 21.50  2.67  );
+      }
+      Experiment { # Experiment SR 150
+        R_type = 1;
+        Q_to_release = 625.6778;  
+        Print (C_central_ngml, 0.75   1.00   1.50   2.00   3.00   4.00   6.00   8.00  24.00 );
+        Data ( C_central_ngml, 9.06  38.30  76.70  46.80  43.30 105.00  56.90  36.90   4.20 );
+      }
+      Experiment { # Experiment ER 150
+        R_type = 2;
+        Q_to_release = 625.6778;  
+        Print (C_central_ngml, 1.50   2.00   3.00   4.00   6.00   8.00  24.00  48.00 );
+        Data ( C_central_ngml, 2.02  47.10 121.00  60.90  42.60  22.30   7.13   2.25 );
+      }
+      Experiment { # Experiment ER 300
+        R_type = 2;
+        Q_to_release = 1251.356;  
+        Print (C_central_ngml, 0.75   1.00   1.50   2.00   3.00   4.00   6.00   8.00  24.00  48.00 );
+        Data ( C_central_ngml, 2.97   8.48  26.40  44.20 108.00  73.00  54.60  42.40   8.09   1.66 );
+      }
+    } # End individual 29
+    
+    Level { # individual 30 F ------------------------------------------------------------
+      
+      BDM = 60.5; 
+      
+      Distrib ( Peff, 
+                TruncLogNormal_v, Peff,           Va_Peff,           0.05,  0.31);      
+      Distrib ( Vmax_met_vitro_liver, 
+                TruncLogNormal_v, Vmax_met_vitro_liver, Va_Vmax_met_vitro_liver, 1e-5, 1e-3); 
+      Distrib ( V_central_LKg, 
+                TruncLogNormal_v, V_central_LKg,  Va_V_central_LKg,  1.5, 28.5);
+      Distrib ( Kc2p, 
+                TruncLogNormal_v, Kc2p,           Va_Kc2p,           0.01, 0.19);
+      Distrib ( Kp2c, 
+                TruncLogNormal_v, Kp2c,           Va_Kp2c,           0.004, 0.076);
+      
+      Experiment { # Experiment IR 75
+        R_type = 0;
+        Q_to_release = 312.8389;
+        Print (C_central_ngml,  0.50   0.75   1.00   1.50   2.00   3.00   4.00   6.00   8.00  24.00  48.00  );
+        Data  (C_central_ngml, 31.20  81.80  83.40 104.00  66.20  46.40  33.70  18.20  11.60   3.88   1.96  );
+      }
+      Experiment { # Experiment IR 100
+        R_type = 0;
+        Q_to_release = 417.1185;
+        Print (C_central_ngml,  0.75  1.00  1.50  2.00  3.00  4.00  6.00  8.00 24.00 48.00 );
+        Data  (C_central_ngml, 18.30 33.60 97.30 94.50 63.60 27.00 36.80 13.00  4.45  2.16 );
+      }
+      Experiment { # Experiment SR 100
+        R_type = 1;
+        Q_to_release = 417.1185;
+        Print (C_central_ngml,  0.50  0.75  1.00  1.50  2.00  3.00  4.00  6.00  8.00 24.00 48.00  );
+        Data ( C_central_ngml, 18.00 29.30 41.90 63.70 52.50 51.20 54.80 32.60  7.71  4.78  2.56  );
+      }
+      Experiment { # Experiment SR 150
+        R_type = 1;
+        Q_to_release = 625.6778;  
+        Print (C_central_ngml,  0.75  1.00  1.50  2.00  3.00  4.00  6.00  8.00 24.00 48.00 );
+        Data ( C_central_ngml, 39.60 63.00 51.90 48.20 60.20 77.10 55.80 11.60  7.50  3.04 );
+      }
+      Experiment { # Experiment ER 150
+        R_type = 2;
+        Q_to_release = 625.6778;  
+        Print (C_central_ngml,  1.00   1.50   2.00   3.00   4.00   6.00   8.00  24.00  48.00  72.00  96.00 );
+        Data ( C_central_ngml, 10.80  50.60  46.40 160.00  81.90  64.00  37.20  14.80   8.08   5.82   2.88 );
+      }
+      Experiment { # Experiment ER 300
+        R_type = 2;
+        Q_to_release = 1251.356;  
+        Print (C_central_ngml,  1.00   1.50   2.00   3.00   4.00   6.00   8.00  24.00  48.00  96.00  );
+        Data ( C_central_ngml, 10.20  19.70  48.80 105.00 154.00 151.00 102.00  19.30  12.00   2.59  );
+      }
+    } # End individual 30
+    
+    Level { # individual 31 F ------------------------------------------------------------
+      
+      BDM = 84.6; 
+      
+      Distrib ( Peff, 
+                TruncLogNormal_v, Peff,           Va_Peff,           0.05,  0.31);      
+      Distrib ( Vmax_met_vitro_liver, 
+                TruncLogNormal_v, Vmax_met_vitro_liver, Va_Vmax_met_vitro_liver, 1e-5, 1e-3); 
+      Distrib ( V_central_LKg, 
+                TruncLogNormal_v, V_central_LKg,  Va_V_central_LKg,  1.5, 28.5);
+      Distrib ( Kc2p, 
+                TruncLogNormal_v, Kc2p,           Va_Kc2p,           0.01, 0.19);
+      Distrib ( Kp2c, 
+                TruncLogNormal_v, Kp2c,           Va_Kp2c,           0.004, 0.076);
+      
+      Experiment { # Experiment IR 75
+        R_type = 0;
+        Q_to_release = 312.8389;
+        Print (C_central_ngml,  0.50   0.75   1.00   1.50   2.00   3.00   4.00   6.00   8.00  24.00  48.00  );
+        Data  (C_central_ngml, 92.20 148.00 128.00 127.00  99.00  66.10  43.10  28.80  24.50   4.61   2.87  );
+      }
+      Experiment { # Experiment IR 100
+        R_type = 0;
+        Q_to_release = 417.1185;
+        Print (C_central_ngml,  0.50   0.75   1.00   1.50   2.00   3.00   4.00   6.00   8.00  24.00  48.00  72.00 );
+        Data  (C_central_ngml, 25.60 116.00 150.00 147.00 119.00  85.50  62.60  32.70  28.50   5.83   3.79   1.63 );
+      }
+      Experiment { # Experiment SR 100
+        R_type = 1;
+        Q_to_release = 417.1185;
+        Print (C_central_ngml,  0.25  0.50  0.75  1.00  1.50  2.00  3.00  4.00  6.00  8.00 24.00 );
+        Data  (C_central_ngml, 10.70 37.20 47.50 50.50 43.10 58.10 68.70 43.20 31.70  8.55  1.98 );
+      }
+      Experiment { # Experiment SR 150
+        R_type = 1;
+        Q_to_release = 625.6778;  
+        Print (C_central_ngml,  0.25   0.50   0.75   1.00   1.50   2.00   3.00   4.00   6.00   8.00  48.00  72.00 );
+        Data  (C_central_ngml, 11.10  77.70 120.00 193.00 155.00 131.00 154.00  97.10  70.10  17.40   5.80   2.97 );
+      }
+      Experiment { # Experiment ER 150
+        R_type = 2;
+        Q_to_release = 625.6778;  
+        Print (C_central_ngml,  1.00  1.50  2.00  3.00  4.00  6.00 24.00 48.00 );
+        Data  (C_central_ngml, 40.10 64.10 70.10 64.20 55.60 50.10 10.10  2.74 );
+      }
+      Experiment { # Experiment ER 300
+        R_type = 2;
+        Q_to_release = 1251.356;  
+        Print (C_central_ngml, 0.50   0.75   1.00   1.50   2.00   3.00   4.00   6.00   8.00  24.00  48.00  72.00 );
+        Data  (C_central_ngml, 1.90  75.90 106.00 133.00  78.60  97.40 115.00  79.80  55.80  21.50  10.30   6.45 );
+      }
+    } # End individual 31
+    
+    Level { # individual 33 F ------------------------------------------------------------
+      
+      BDM = 61.0; 
+      
+      Distrib ( Peff, 
+                TruncLogNormal_v, Peff,           Va_Peff,           0.05,  0.31);      
+      Distrib ( Vmax_met_vitro_liver, 
+                TruncLogNormal_v, Vmax_met_vitro_liver, Va_Vmax_met_vitro_liver, 1e-5, 1e-3); 
+      Distrib ( V_central_LKg, 
+                TruncLogNormal_v, V_central_LKg,  Va_V_central_LKg,  1.5, 28.5);
+      Distrib ( Kc2p, 
+                TruncLogNormal_v, Kc2p,           Va_Kc2p,           0.01, 0.19);
+      Distrib ( Kp2c, 
+                TruncLogNormal_v, Kp2c,           Va_Kp2c,           0.004, 0.076);
+      
+      Experiment { # Experiment IR 75
+        R_type = 0;
+        Q_to_release = 312.8389;
+        Print (C_central_ngml, 0.5 0.75 1 1.5 2 3 4 6 8 );
+        Data (C_central_ngml, 34.1 56.3 85.2 71.5 48 40.2 25.7 10.6 7.44 );
+      }
+      Experiment { # Experiment IR 100
+        R_type = 0;
+        Q_to_release = 417.1185;
+        Print (C_central_ngml, 0.5 0.75 1 1.5 2 3 4 6 8 24 );
+        Data (C_central_ngml, 139 166 163 143 135 72.5 54 31.2 21.9 4.63 );
+      }
+      Experiment { # Experiment SR 100
+        R_type = 1;
+        Q_to_release = 417.1185;
+        Print (C_central_ngml, 0.25 0.5 0.75 1 1.5 2 3 4 6 8 24 48 72 );
+        Data (C_central_ngml, 27.5 94.4 107 101 91.3 91.2 84.3 61.4 47.8 9.41 5.28 3.05 2.35 );
+      }
+      Experiment { # Experiment SR 150
+        R_type = 1;
+        Q_to_release = 625.6778;  
+        Print (C_central_ngml, 0.25 0.5 0.75 1 1.5 2 3 4 6 8 24 48 72 );
+        Data (C_central_ngml, 15.3 135 185 176 164 108 113 71.7 51.3 9.02 5.48 3.61 2.29 );
+      }
+      Experiment { # Experiment ER 150
+        R_type = 2;
+        Q_to_release = 625.6778;  
+        Print (C_central_ngml, 0.75 1 1.5 2 3 4 6 8 24 48 );
+        Data (C_central_ngml, 26.3 46.7 45.8 28.2 69.2 37 38.9 27.5 8.57 1.52 );
+      }
+      Experiment { # Experiment ER 300
+        R_type = 2;
+        Q_to_release = 1251.356;  
+        Print ( C_central_ngml,  1.0   1.5   2.0   3.0   4.0   6.0   8.0  24.0  48.0 );
+        Data  ( C_central_ngml, 28.0 116.0  81.5  90.9  42.1  45.1  36.9  12.5   3.2 );
+      }
+    } # End individual 33
+    
+  } # End Individuals
+} # End Population Level
+End.

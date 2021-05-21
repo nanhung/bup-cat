@@ -1,0 +1,75 @@
+Parameter,Description,Default,Minimum,Maximum,Reference
+MM,"Molecular mass, g/mol",239.74,,,\cite{williams2017comptox}
+Mol\_vol,"Solute molar volume, ml/mole",225,,,\cite{williams2017comptox}
+AB\_type,"Acido-basic type, -",2,,,\cite{williams2017comptox}
+pKa,Acid dissociation constant,8.75,8,9,\cite{takayanagi2016analysis}
+pKb,Basic dissociation constant,0,,,
+G\_immediate\_d,Dosage form switches / immediate dissolved release,0,,,
+G\_immediate\_u,Dosage form switches / immediate undissolved release,0,,,
+G\_delayed\_d,Dosage form switches / delayed dissolved release,0,,,
+G\_delayed\_u,Dosage form switches / delayed undissolved release,1,,,
+R\_type,Released type,1,,,
+Weibull\_scale,Weibull scale coefficient,1,0.1,4,
+Weibull\_slope,Weibull slope coefficient,1,1,3,
+G\_Radius,"Galenic radius, microm",25,10,100,
+G\_Density,"Powder density, g/ml",1.4,1,1.8,\cite{melillo2019variance}
+Solubility,"Intrinsic water solubility, microg/L",1.00E+05,1.00E+04,1.00E+05,Assumed
+K\_precip,"Precipitation rate, 1/h",4,0.4,40,Assumed
+f\_Abs\_stom,Absorption switches of stomach,0,,,Assumed
+f\_Abs\_duod,Absorption switches of duodenum,1,,,Assumed
+f\_Abs\_jeju,Absorption switches of jejunum,1,,,Assumed
+f\_Abs\_ileum,Absorption switches of ileum,1,,,Assumed
+f\_Abs\_cecum,Absorption switches of cecum,1,,,Assumed
+f\_Abs\_colon,Absorption switches of colon,1,,,Assumed
+Peff,"Effective permeability of gut epithelia, dm/h",0.145,0.05,0.31,\cite{melillo2019variance}
+Ke\_over\_a\_epit,"Excretion over absorption rate constant ratios between lumen and epithelium, -",0,,,Assumed
+Ke\_over\_a\_tiss,"Excretion over absorption rate constant ratios between epithelium and tissue, -",0,,,Assumed
+Vmax\_eff\_stom,"Maxumun rate of efflux from stomach, micromole/h",0,,,Assumed
+Vmax\_eff\_duod,"Maxumun rate of efflux from duodenum, micromole/h",0,,,Assumed
+Vmax\_eff\_jeju,"Maxumun rate of efflux from jejunum, micromole/h",0,,,Assumed
+Vmax\_eff\_ileum,"Maxumun rate of efflux from ileum, micromole/h",0,,,Assumed
+Vmax\_eff\_cecum,"Maxumun rate of efflux from cecum, micromole/h",0,,,Assumed
+Vmax\_eff\_colon,"Maxumun rate of efflux from colon, micromole/h",0,,,Assumed
+Vmax\_eff\_liver,"Maxumun rate of efflux from liver, micromole/h",0,,,Assumed
+Vmax\_inf\_stom,"Maxumun rate of active influx to stomach, micromole/h",0,,,Assumed
+Vmax\_inf\_duod,"Maxumun rate of active influx to duodenum, micromole/h",0,,,Assumed
+Vmax\_inf\_jeju,"Maxumun rate of active influx to jejunum, micromole/h",0,,,Assumed
+Vmax\_inf\_ileum,"Maxumun rate of active influx to ileum, micromole/h",0,,,Assumed
+Vmax\_inf\_cecum,"Maxumun rate of active influx to cecum, micromole/h",0,,,Assumed
+Vmax\_inf\_colon,"Maxumun rate of active influx to colon, micromole/h",0,,,Assumed
+Vmax\_inf\_liver,"Maxumun rate of active influx to liver, micromole/h",0,,,Assumed
+Km\_eff,"Active efflux Km, microM",1,,,Assumed
+Km\_inf,"Active influx Km, microM",1,,,Assumed
+Ratio\_BP,"Blood over plasma concentration ratio, - ",0.82,0.72,0.92,\cite{xue2018prediction}
+Fu\_plasma,"Fraction unbound in plasma, -",0.16,0.06,0.26,\cite{xue2018prediction}
+Fu\_stom,"Fraction unbound in stomach, -",0.16,0.06,0.26,\cite{xue2018prediction}
+Fu\_duod,"Fraction unbound in duodenum, -",0.16,0.06,0.26,\cite{xue2018prediction}
+Fu\_jeju,"Fraction unbound in jejunum, -",0.16,0.06,0.26,\cite{xue2018prediction}
+Fu\_ileum,"Fraction unbound in ileum, -",0.16,0.06,0.26,\cite{xue2018prediction}
+Fu\_cecum,"Fraction unbound in cecum, - ",0.16,0.06,0.26,\cite{xue2018prediction}
+Fu\_colon,"Fraction unbound in colon, - ",0.16,0.06,0.26,\cite{xue2018prediction}
+Fu\_liver,"Fraction unbound in liver, -",0.16,0.06,0.26,\cite{xue2018prediction}
+Fu\_vitro\_plasma,"Fraction unbound in in-vito metabolic assay in stomach, -",0.16,0.06,0.26,\cite{xue2018prediction}
+Fu\_vitro\_stom,"Fraction unbound in in-vitro metabolic assay in stomach, -",0.16,0.06,0.26,\cite{xue2018prediction}
+Fu\_vitro\_duod,"Fraction unbound in in-vitro metabolic assay in duodenum, -",0.16,0.06,0.26,\cite{xue2018prediction}
+Fu\_vitro\_jeju,"Fraction unbound in in-vitro metabolic assay in jejunum, -",0.16,0.06,0.26,\cite{xue2018prediction}
+Fu\_vitro\_ileum,"Fraction unbound in in-vitro metabolic assay in ileum, -",0.16,0.06,0.26,\cite{xue2018prediction}
+Fu\_vitro\_cecum,"Fraction unbound in in-vitro metabolic assay in cecum, -",0.16,0.06,0.26,\cite{xue2018prediction}
+Fu\_vitro\_colon,"Fraction unbound in in-vitro metabolic assay in colon, -",0.16,0.06,0.26,\cite{xue2018prediction}
+Fu\_vitro\_liver,"Fraction unbound in in-vitro metabolic assay in liver, -",0.16,0.06,0.26,\cite{xue2018prediction}
+Kpuu\_stom,"Partition coefficient of stomach, -",1,0.5,5,Assume
+Kpuu\_duod,"Partition coefficient of duodenum, -",1,0.5,5,Assume
+Kpuu\_jeju,"Partition coefficient of jejunum, -",1,0.5,5,Assume
+Kpuu\_ileum,"Partition coefficient of ileum, -",1,0.5,5,Assume
+Kpuu\_cecum,"Partition coefficient of cecum, -",1,0.5,5,Assume
+Kpuu\_colon,"Partition coefficient of colon, -",1,0.5,5,Assume
+Kpuu\_liver,"Partition coefficient of liver, -",1,0.5,5,Assume
+V\_central,"Volume of central compartment, L/Kg",15,6,24,\cite{connarn2017pharmacokinetics}
+V\_periph,"Volume of peripheral compartment, L/Kg",35,14,56,\cite{connarn2017pharmacokinetics}
+Kc2p,"Transfer rate constants from central to peripheral compartment, 1/h",0.1,0.01,0.19,\cite{connarn2017pharmacokinetics}
+Kp2c,"Transfer rate constants from peripheral to central compartment, 1/h",0.04,0.004,0.076,\cite{connarn2017pharmacokinetics}
+Kelim,"Elimination rate constant from central compartment, 1/h",0,,,Assumed
+Vmax\_met\_vitro\_intestine,"Metabolism Vmax in intestine, micromole/min/mg microsomal proteins",2.60E-05,0.001,1.00E-05,\cite{connarn2015metabolism}
+Vmax\_met\_vitro\_liver,"Metabolism Vmax in liver, micromole/min/mg microsomal proteins",0.0001,0.001,1.00E-05,\cite{connarn2015metabolism}
+Km\_met\_vitro\_intestine,"Metabolism Km in intestine, micromole/min/mg microsomal proteins",573.4,,,\cite{connarn2015metabolism}
+Km\_met\_vitro\_liver,"Metabolism Km in liver, micromole/min/mg microsomal proteins",265.7,,,\cite{connarn2015metabolism}

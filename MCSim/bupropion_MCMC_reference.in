@@ -1,0 +1,74 @@
+Integrate (Lsodes, 1e-8, 1e-8, 1)
+
+SetPoints ("poppred_reference.out",
+           "poppred_reference.dat", 
+           0,
+           Ve_C_central,
+           M_G_Radius,
+           M_Peff,
+           M_Fu_plasma,
+           M_Fu_vitro_liver,           
+           M_Kpuu_liver,
+           M_Vmax_met_vitro_liver,
+           M_V_central_LKg,
+           M_Kc2p,
+           M_Kp2c,
+           M_Weibull_scale_IR,
+           M_Weibull_scale_SR,
+           M_Weibull_scale_ER,
+           M_Weibull_slope_ER,
+           Vr_G_Radius,
+           Vr_Peff,
+           Vr_Fu_plasma,
+           Vr_Fu_vitro_liver,
+           Vr_Kpuu_liver,
+           Vr_Vmax_met_vitro_liver,
+           Vr_V_central_LKg,
+           Vr_Kc2p,
+           Vr_Kp2c,
+           Vr_Weibull_scale_IR
+);
+
+# Dosage forms: 0/1 switches, mutually exclusive,
+G_delayed_u = 1;
+
+# Absorption on(1)/off(0) switches
+f_Abs_stom  = 0;
+
+# Weibull delayed release parameters
+Weibull_slope_IR = 1; 
+
+
+Distrib ( G_Radius,
+          TruncLogNormal_v, M_G_Radius,       Vr_G_Radius,       7, 70);
+Distrib ( Fu_plasma, 
+          TruncLogNormal_v, M_Fu_plasma,      Vr_Fu_plasma,      0.064, 0.256);
+Distrib ( Fu_vitro_liver, 
+          TruncLogNormal_v, M_Fu_vitro_liver, Vr_Fu_vitro_liver, 0.064, 0.256);
+Distrib ( Kpuu_liver, 
+          TruncLogNormal_v, M_Kpuu_liver,     Vr_Kpuu_liver,     0.5, 5); 
+Distrib ( V_central_LKg, 
+          TruncLogNormal_v, M_V_central_LKg,  Vr_V_central_LKg,  1.5, 28.5);
+Distrib ( Kc2p, 
+          TruncLogNormal_v, M_Kc2p,           Vr_Kc2p,           0.01, 0.19);
+Distrib ( Kp2c, 
+          TruncLogNormal_v, M_Kp2c,           Vr_Kp2c,           0.004, 0.076);
+Distrib ( Peff, 
+          TruncLogNormal_v, M_Peff,           Vr_Peff,           0.05,  0.31);
+Distrib ( Vmax_met_vitro_liver, 
+          TruncLogNormal_v, M_Vmax_met_vitro_liver, Vr_Vmax_met_vitro_liver, 1e-5, 1e-3); 
+Distrib ( Weibull_scale_IR, 
+          TruncLogNormal_v, M_Weibull_scale_IR, Vr_Weibull_scale_IR, 0.068, 0.272);
+
+Distrib (BDM, TruncNormal, 80.9, 12.7, 50, 110);
+
+
+Experiment { # Experiment IR 100
+  
+  R_type = 0;
+  Q_to_release = 417.1185;
+  Print (C_central_ngml,  0.25,  0.50,  0.75,  1.00,  1.50,  2.00,  3.00, 4.00,  6.00, 8.00, 24.00, 48.00, 72.00, 96.00);
+  Print (AUC_central, 96);
+}
+
+End.

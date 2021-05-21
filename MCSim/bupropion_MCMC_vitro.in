@@ -1,0 +1,92 @@
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# bupropion_MCMC_vitro.in
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Integrate (Lsodes, 1e-8, 1e-8, 1);
+
+MCMC ("MCMC.default.out","", # name of output file
+      "",                    # name of data file
+      5000,0,                # iterations, print predictions flag
+      5, 5000,               # printing frequency, iters to print
+      10101010);             # random seed
+
+Level { 
+  
+  G_delayed_d = 1;
+
+  Likelihood(Q_released, LogNormal, Prediction(Q_released), 1.1);
+
+  Level {
+  
+    Distrib(Weibull_scale_IR, Uniform, 0.1, 5);
+    Weibull_slope_IR = 1;
+    
+    Experiment { # Experiment IR 75
+      
+      Q_to_release = 312.8389; 
+      
+      R_type = 0;
+      Print (Q_released, 0.083 0.167 0.250 0.500 0.750);
+      Data (Q_released,  106.3652, 234.6292, 265.9131, 284.6834 297.197);
+    }
+    
+    Experiment { # Experiment IR 100
+      
+      Q_to_release = 417.1185; 
+      
+      R_type = 0;
+      Print (Q_released, 0.083 0.167 0.250 0.500 0.750 );
+      Data (Q_released, 133.4779 300.3253 367.0643 392.0914 400.4338);
+    }
+  }  
+  
+  
+  Level {
+  
+    Distrib(Weibull_scale_SR, Uniform, 0.1, 5);
+    Weibull_slope_SR = 1;  
+    
+    Experiment { # Experiment SR 100
+      
+      Q_to_release = 417.1185; # 100 * 1000 / 239.74
+      
+      R_type = 1;
+      Print (Q_released, 1, 2, 4, 8);
+      Data (Q_released, 133.4779, 208.5593, 304.4965, 408.7762 );
+    }
+    
+    Experiment { # Experiment SR 150
+      
+      Q_to_release = 625.6778; # 150 * 1000 / 239.74
+      
+      R_type = 1;
+      Print (Q_released, 1, 2, 4, 8 );
+      Data (Q_released, 193.9601, 281.555, 419.2041, 581.8804 );
+    }
+  }
+  Level {
+    
+    Distrib(Weibull_scale_ER, Uniform, 0.1, 5);
+    Distrib(Weibull_slope_ER, Uniform, 1.1, 6);  
+
+    Experiment { # Experiment ER 150
+      
+      Q_to_release = 625.6778; # 150 * 1000 / 239.74
+      
+      R_type = 2;
+      Print (Q_released, 1, 2, 4, 8 );
+      Data (Q_released, 93.85167, 269.0415, 519.3126, 613.1643 );
+    }
+    
+    Experiment { # Experiment ER 300
+      
+      Q_to_release = 1163.761; # 300 * 1000 / 239.74
+      
+      R_type = 2;
+      Print (Q_released, 1, 2, 4, 8 );
+      Data (Q_released, 150.1627, 463.0016, 900.9761, 1138.734 );
+    }
+  }
+  
+} 
+End.
