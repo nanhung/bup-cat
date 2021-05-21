@@ -177,7 +177,8 @@ p4.2 <- rel.df2 %>%
         panel.grid.minor.y = element_blank(),
         strip.text = element_blank())
 
-tiff("plots/fig4.tiff", res=600, compression = "lzw", height = 6, width = 9, units="in")
+#tiff("plots/fig4.tiff", res=600, compression = "lzw", height = 6, width = 9, units="in")
+pdf("plots/fig4.pdf", height = 6, width = 9)
 plot_grid(p4.1, p4.2, nrow = 2, rel_heights = c(2/3, 1/3),
           align = "v", axis = "l", labels = c("A", "B"))
 dev.off()

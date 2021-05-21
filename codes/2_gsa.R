@@ -326,7 +326,8 @@ y <- solve_mcsim(x, mName = mfile, params = parameters,
                  rtol = 1e-8, atol = 1e-8, parallel = TRUE) 
 
 # Plot -------------------------------------------------------------------------
-tiff("plots/fig5.tiff", res=600, compression = "lzw", height = 6, width = 10, units="in")
+#tiff("plots/fig5.tiff", res=600, compression = "lzw", height = 6, width = 10, units="in")
+pdf("plots/fig5.pdf", height = 6, width = 10)
 heat_check(y, SI.cutoff = c(0.05, 0.1), order = "total order", text = T) + 
   theme_pubr() + labs(x="Time, hr", y="", title = "Total sensitivity index") +
   theme(strip.background = element_blank(),

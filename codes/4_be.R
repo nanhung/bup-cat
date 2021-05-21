@@ -103,7 +103,7 @@ CMAX <- c(apply(comp[,(comp_1.0:comp_1.1)], 1, max),
 AUCt <- c(comp$AUC_central_1.1, comp$AUC_central_2.1,
           comp$AUC_central_3.1)
 
-
+# Plot -------------------------------------------------------------------------
 p9.2 <- data.frame(rep(test, 2), c(CMAX, AUCt)) %>%
   add_column(parameter = rep(c("Cmax", "AUC"), each = nMC*3)) %>% 
   `colnames<-`(c("Variable","value","parameter")) %>%
@@ -118,7 +118,8 @@ p9.2 <- data.frame(rep(test, 2), c(CMAX, AUCt)) %>%
   theme(legend.title = element_blank(),
         legend.position = "top")
 
-tiff("plots/fig9.tiff", res=600, compression = "lzw", height = 8, width = 8, units="in")
+#tiff("plots/fig9.tiff", res=600, compression = "lzw", height = 8, width = 8, units="in")
+pdf("plots/fig9.pdf", height = 8, width = 8)
 plot_grid(p9.1, p9.2, nrow = 2,  align = "v", axis = "l", labels = c("A", "B"))
 dev.off()
 #ggsave("plots/fig9.jpeg", dpi = 300, height = 8, width = 8, units="in")
