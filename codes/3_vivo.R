@@ -13,6 +13,7 @@ library(bayestestR)
 library(PowerTOST)
 library(foreach)
 library(doParallel) 
+library(PKNCA)
 source("MCSim/function.R")
 
 # Posterior check --------------------------------------------------------------
@@ -410,6 +411,53 @@ dat.v %>% ggplot(aes(Time, Conc)) +
     axis.text = element_text(size = 12, colour = "black", face = "bold"))
 dev.off()
 #ggsave("plots/fig7.jpeg", dpi = 300, height = 8, width = 14, units="in")
+
+
+
+# Estimate Cmax, Tmax, and AUC 
+## Calibration group
+m_cal <- matrix(nrow = 3, ncol = 6)
+for (i in  1:6){
+  conc_obj <- BUP %>% filter(Formulation == form[i] & group == "Calibration") %>%
+    mutate(conc = ifelse(Time == 0, 0, Conc)) %>% 
+    filter(!is.na(conc)) %>% 
+    PKNCAconc(conc~Time|Subject)
+  d_dose <- BUP %>% filter(Formulation == form[i] & group == "Calibration") %>%
+    select(Dose, Time, Subject, Conc) %>% filter(Time == 0)
+  dose_obj <- PKNCAdose(d_dose, Dose~Time|Subject)
+  data_obj_automatic <- PKNCAdata(conc_obj, dose_obj)
+  results_obj_automatic <- pk.nca(data_obj_automatic)
+  sum <- summary(results_obj_automatic)
+  m_cal[1,i] <- sum$cmax[2] # geometric mean and geometric coefficient of variation 
+  m_cal[2,i] <- sum$tmax[2] # median and range
+  m_cal[3,i] <- sum$aucinf.obs[2] # geometric mean and geometric coefficient of variation   
+}
+m_cal
+
+## Validation group
+m_val <- matrix(nrow = 3, ncol = 6)
+for (i in  1:6){
+  conc_obj <- BUP %>% filter(Formulation == form[i] & group == "Validation") %>%
+    mutate(conc = ifelse(Time == 0, 0, Conc)) %>% 
+    filter(!is.na(conc)) %>% 
+    PKNCAconc(conc~Time|Subject)
+  d_dose <- BUP %>% filter(Formulation == form[i] & group == "Validation") %>%
+    select(Dose, Time, Subject, Conc) %>% filter(Time == 0)
+  dose_obj <- PKNCAdose(d_dose, Dose~Time|Subject)
+  data_obj_automatic <- PKNCAdata(conc_obj, dose_obj)
+  results_obj_automatic <- pk.nca(data_obj_automatic)
+  sum <- summary(results_obj_automatic)
+  m_val[1,i] <- sum$cmax[2] # geometric mean and geometric coefficient of variation 
+  m_val[2,i] <- sum$tmax[2] # median and range
+  m_val[3,i] <- sum$aucinf.obs[2] # geometric mean and geometric coefficient of variation   
+}
+m_val
+
+
+
+
+
+
 
 # Virtual individuals (reference) ----------------------------------------------
 
