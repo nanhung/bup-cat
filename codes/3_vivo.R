@@ -14,6 +14,7 @@ library(PowerTOST)
 library(foreach)
 library(doParallel) 
 library(PKNCA)
+library(kableExtra)
 source("MCSim/function.R")
 
 # Posterior check --------------------------------------------------------------
@@ -432,7 +433,6 @@ for (i in  1:6){
   m_cal[2,i] <- sum$tmax[2] # median and range
   m_cal[3,i] <- sum$aucinf.obs[2] # geometric mean and geometric coefficient of variation   
 }
-m_cal
 
 ## Validation group
 m_val <- matrix(nrow = 3, ncol = 6)
@@ -451,13 +451,51 @@ for (i in  1:6){
   m_val[2,i] <- sum$tmax[2] # median and range
   m_val[3,i] <- sum$aucinf.obs[2] # geometric mean and geometric coefficient of variation   
 }
+
+## Simulation group
+
+str_Sim <- c("C_central_ngml_1.1", "C_central_ngml_2.1",
+             "C_central_ngml_3.1", "C_central_ngml_4.1",
+             "C_central_ngml_5.1", "C_central_ngml_6.1")
+l <- list()
+for(i in 1:6){
+  str_sim_location <- which(names(df) == str_Sim[i])
+  end_sim_location <- str_sim_location + 13
+  l[[i]] <- cbind(0, df[,c(str_sim_location:end_sim_location)]) %>% gather()
+}
+
+sim_BUP <- do.call(rbind, l) %>%
+  `colnames<-`(c("var","Conc")) %>%
+  add_column(Time = rep(rep(c(0, t), each = n), 6)) %>%
+  add_column(Subject = rep(c(1:n), 90)) %>%
+  add_column(Formulation = rep(form, each = 15*n)) %>%
+  add_column(Dose = rep(c(75, 100, 100, 150, 150, 300), each = 15*n)) %>%
+  group_by(Formulation, Time)
+
+m_sim <- matrix(nrow = 3, ncol = 6)
+for (i in  1:6){
+  conc_obj <- sim_BUP %>% filter(Formulation == form[i]) %>%
+    PKNCAconc(Conc~Time|Subject)
+  d_dose <- sim_BUP %>% filter(Formulation == form[i]) %>%
+    select(Dose, Time, Subject, Conc) %>% 
+    filter(Time == 0)
+  
+  dose_obj <- PKNCAdose(d_dose, Dose~Time|Subject)
+  data_obj_automatic <- PKNCAdata(conc_obj, dose_obj)
+  results_obj_automatic <- pk.nca(data_obj_automatic)
+  sum <- summary(results_obj_automatic)
+  m_sim[1,i] <- sum$cmax[2]  
+  m_sim[2,i] <- sum$tmax[2] 
+  m_sim[3,i] <- sum$aucinf.obs[2] 
+}
+
+m_cal
 m_val
+m_sim
 
-
-
-
-
-
+data.frame(rep(c("Cmax", "Tmax", "AUC"), 6), c(m_cal), c(m_val), c(m_sim)) %>% 
+  `colnames<-`(c("Formulato", "Calibation", "Validation", "Simulation")) %>%
+  saveRDS(file = "outputs/pk_parameters.rds")
 
 # Virtual individuals (reference) ----------------------------------------------
 
