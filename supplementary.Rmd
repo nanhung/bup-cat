@@ -465,7 +465,7 @@ read.csv(mcmc_report) %>%
 ```{r}
 readRDS(file = "outputs/pk_parameters.rds") %>%
   kbl(booktabs = T, align = "c", linesep = '',
-      caption = "Table S6. Comparison of PK parameters from calibration, validation and simulation groups.") %>%
+      caption = "Table S6. Comparison of PK parameters from clinical data and PBPK model prediction.") %>%
   kable_paper(full_width = F) %>%
   pack_rows("IR 75", 1, 3) %>%
   pack_rows("IR 100", 4, 6) %>%
@@ -473,8 +473,8 @@ readRDS(file = "outputs/pk_parameters.rds") %>%
   pack_rows("SR 150", 10, 12) %>%
   pack_rows("ER 150", 13, 15) %>%
   pack_rows("ER 300", 16, 18) %>%
-  footnote(general = "The Cmax and AUC are represented by geometric mean and geometric coefficient of variation. The Tmax is represented by median and range",
-           threeparttable = T)
+  footnote(general = "The Cmax and AUC are represented by geometric mean ($\\\\sqrt[\\\\leftroot{1} \\\\uproot{1} n]{A_1A_2\\\\dotsm A_n}$) and geometric coefficient of variation ($\\\\sqrt[]{\\\\exp(\\\\text{stdev}(\\\\ln(A_i))^2)-1} \\\\times 100\\\\%$). The Tmax is represented by median and range",
+           threeparttable = T, footnote_as_chunk=T, escape=F)
 ```
 
 \clearpage

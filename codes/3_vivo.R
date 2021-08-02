@@ -494,7 +494,7 @@ m_val
 m_sim
 
 data.frame(rep(c("Cmax", "Tmax", "AUC"), 6), c(m_cal), c(m_val), c(m_sim)) %>% 
-  `colnames<-`(c("Formulato", "Calibation", "Validation", "Simulation")) %>%
+  `colnames<-`(c("Formulation", "Data (Calibration)", "Data (Validation)", "PBPK (Prediction)")) %>%
   saveRDS(file = "outputs/pk_parameters.rds")
 
 # Virtual individuals (reference) ----------------------------------------------
