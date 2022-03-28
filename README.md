@@ -1,3 +1,5 @@
+The source code of "Hsieh NH, Bois FY, Tsakalozou E, Ni Z, Yoon M, Sun W, Klein M, Reisfeld B, Chiu WA. [A Bayesian population physiologically based pharmacokinetic absorption modeling approach to support generic drug development: application to bupropion hydrochloride oral dosage forms](https://doi.org/10.1007/s10928-021-09778-5). Journal of Pharmacokinetics and Pharmacodynamics 2021 Sep; 22:1-6"
+
 - **codes:** The R source code to reproduce the modeling and analyze result. The script in `0_pretest.R` can use to generate `mod.exe` and `mcsim.bupropion_CAT.model.exe`.
 
 - **datasets:** The raw bupropion PK data and physicological/chemical-specific parameters.
